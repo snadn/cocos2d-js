@@ -150,26 +150,40 @@ static bool js_cocos2dx_ArmatureAnimation_setMovementEventCallFunc(JSContext *cx
     cocostudio::ArmatureAnimation* cobj = (cocostudio::ArmatureAnimation *)(proxy ? proxy->ptr : NULL);
     JSB_PRECONDITION2( cobj, cx, false, "Invalid Native Object");
 
-    if (argc == 2) {
+    if (argc > 0) {
         jsval *argv = JS_ARGV(cx, vp);
-
-        JSArmatureWrapper *tmpObj = new JSArmatureWrapper();
-        tmpObj->autorelease();
         
-        cocos2d::__Dictionary* dict = static_cast<cocos2d::__Dictionary*>(cobj->getUserObject());
-        if (nullptr == dict)
-        {
-            dict = cocos2d::__Dictionary::create();
-            cobj->setUserObject(dict);
+        if (JSVAL_IS_NULL(argv[0])) {
+            cobj->setMovementEventCallFunc(nullptr);
+            
+            return true;
         }
-        dict->setObject(tmpObj, "moveEvent");
-
-        tmpObj->setJSCallbackFunc(argv[0]);
-        tmpObj->setJSCallbackThis(argv[1]);
-
-        cobj->setMovementEventCallFunc(CC_CALLBACK_0(JSArmatureWrapper::movementCallbackFunc, tmpObj, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        
-        return true;
+        else if (argc == 1 || argc == 2) {
+            JSArmatureWrapper *tmpObj = new JSArmatureWrapper();
+            tmpObj->autorelease();
+            
+            cocos2d::__Dictionary* dict = static_cast<cocos2d::__Dictionary*>(cobj->getUserObject());
+            if (nullptr == dict)
+            {
+                dict = cocos2d::__Dictionary::create();
+                cobj->setUserObject(dict);
+            }
+            dict->setObject(tmpObj, "moveEvent");
+            
+            tmpObj->setJSCallbackFunc(argv[0]);
+            if (argc == 1)
+            {
+                tmpObj->setJSCallbackThis(JSVAL_NULL);
+            }
+            else
+            {
+                tmpObj->setJSCallbackThis(argv[1]);
+            }
+            
+            cobj->setMovementEventCallFunc(CC_CALLBACK_0(JSArmatureWrapper::movementCallbackFunc, tmpObj, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            
+            return true;
+        }
     }
     JS_ReportError(cx, "Invalid number of arguments");
     return false;
@@ -181,28 +195,43 @@ static bool js_cocos2dx_ArmatureAnimation_setFrameEventCallFunc(JSContext *cx, u
     js_proxy_t *proxy = jsb_get_js_proxy(obj);
     cocostudio::ArmatureAnimation* cobj = (cocostudio::ArmatureAnimation *)(proxy ? proxy->ptr : NULL);
     JSB_PRECONDITION2( cobj, cx, false, "Invalid Native Object");
-
-    if (argc == 2) {
+    
+    if (argc > 0) {
         jsval *argv = JS_ARGV(cx, vp);
-
-        JSArmatureWrapper *tmpObj = new JSArmatureWrapper();
-        tmpObj->autorelease();
         
-        cocos2d::__Dictionary* dict = static_cast<cocos2d::__Dictionary*>(cobj->getUserObject());
-        if (nullptr == dict)
-        {
-            dict = cocos2d::__Dictionary::create();
-            cobj->setUserObject(dict);
+        if (JSVAL_IS_NULL(argv[0])) {
+            cobj->setFrameEventCallFunc(nullptr);
+            
+            return true;
         }
-        dict->setObject(tmpObj, "frameEvent");
-
-        tmpObj->setJSCallbackFunc(argv[0]);
-        tmpObj->setJSCallbackThis(argv[1]);
-
-        cobj->setFrameEventCallFunc(CC_CALLBACK_0(JSArmatureWrapper::frameCallbackFunc, tmpObj, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-
-        return true;
+        else if (argc == 1 || argc == 2) {
+            JSArmatureWrapper *tmpObj = new JSArmatureWrapper();
+            tmpObj->autorelease();
+            
+            cocos2d::__Dictionary* dict = static_cast<cocos2d::__Dictionary*>(cobj->getUserObject());
+            if (nullptr == dict)
+            {
+                dict = cocos2d::__Dictionary::create();
+                cobj->setUserObject(dict);
+            }
+            dict->setObject(tmpObj, "frameEvent");
+            
+            tmpObj->setJSCallbackFunc(argv[0]);
+            if (argc == 1)
+            {
+                tmpObj->setJSCallbackThis(JSVAL_NULL);
+            }
+            else
+            {
+                tmpObj->setJSCallbackThis(argv[1]);
+            }
+            
+            cobj->setFrameEventCallFunc(CC_CALLBACK_0(JSArmatureWrapper::frameCallbackFunc, tmpObj, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+            
+            return true;
+        }
     }
+    
     JS_ReportError(cx, "Invalid number of arguments");
     return false;
 }
@@ -254,6 +283,43 @@ static bool jsb_Animation_addArmatureFileInfoAsyncCallFunc(JSContext *cx, uint32
         return true;
     }
     JS_ReportError(cx, "Invalid number of arguments");
+    return false;
+}
+
+static bool js_cocos2dx_studio_ActionManagerEx_initWithDictionaryEx(JSContext *cx, uint32_t argc, jsval *vp)
+{
+    jsval *argv = JS_ARGV(cx, vp);
+    bool ok = true;
+    JSObject *obj = JS_THIS_OBJECT(cx, vp);
+    js_proxy_t *proxy = jsb_get_js_proxy(obj);
+    cocostudio::ActionManagerEx* cobj = (cocostudio::ActionManagerEx *)(proxy ? proxy->ptr : NULL);
+    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_studio_ActionManagerEx_initWithDictionaryEx : Invalid Native Object");
+    if (argc == 3) {
+        const char* arg0;
+        const char* arg1;
+        cocos2d::Ref* arg2;
+        std::string arg0_tmp; ok &= jsval_to_std_string(cx, argv[0], &arg0_tmp); arg0 = arg0_tmp.c_str();
+        std::string arg1_tmp; ok &= jsval_to_std_string(cx, argv[1], &arg1_tmp); arg1 = arg1_tmp.c_str();
+        rapidjson::Document arg1Jsondoc;
+        arg1Jsondoc.Parse<0>(arg1);
+        if (arg1Jsondoc.HasParseError()) {
+            CCLOG("GetParseError %s\n",arg1Jsondoc.GetParseError());
+        }
+        do {
+            if (!argv[2].isObject()) { ok = false; break; }
+            js_proxy_t *jsProxy;
+            JSObject *tmpObj = JSVAL_TO_OBJECT(argv[2]);
+            jsProxy = jsb_get_js_proxy(tmpObj);
+            arg2 = (cocos2d::Ref*)(jsProxy ? jsProxy->ptr : NULL);
+            JSB_PRECONDITION2( arg2, cx, false, "Invalid Native Object");
+        } while (0);
+        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_studio_ActionManagerEx_initWithDictionaryEx : Error processing arguments");
+        cobj->initWithDictionary(arg0, arg1Jsondoc, arg2);
+        JS_SET_RVAL(cx, vp, JSVAL_VOID);
+        return true;
+    }
+
+    JS_ReportError(cx, "js_cocos2dx_studio_ActionManagerEx_initWithDictionaryEx : wrong number of arguments: %d, was expecting %d", argc, 3);
     return false;
 }
 
@@ -979,6 +1045,7 @@ extern JSObject* jsb_cocostudio_ColliderBody_prototype;
 extern JSObject* jsb_cocostudio_BaseData_prototype;
 extern JSObject* jsb_cocostudio_AnimationData_prototype;
 extern JSObject* jsb_cocostudio_MovementData_prototype;
+extern JSObject* jsb_cocostudio_ActionManagerEx_prototype;
 
 void register_all_cocos2dx_studio_manual(JSContext* cx, JSObject* global)
 {
@@ -990,6 +1057,8 @@ void register_all_cocos2dx_studio_manual(JSContext* cx, JSObject* global)
 
     JS_DefineFunction(cx, jsb_cocostudio_ArmatureDataManager_prototype, "addArmatureFileInfoAsync", jsb_Animation_addArmatureFileInfoAsyncCallFunc, 3, JSPROP_ENUMERATE | JSPROP_PERMANENT);
     
+    JS_DefineFunction(cx, jsb_cocostudio_ActionManagerEx_prototype, "initWithDictionaryEx", js_cocos2dx_studio_ActionManagerEx_initWithDictionaryEx, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE);
+
     static JSPropertySpec baseDataProps[] = {
         {"x", 0, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED, JSOP_WRAPPER(js_get_BaseData_x), JSOP_WRAPPER(js_set_BaseData_x)},
         {"y", 0, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED, JSOP_WRAPPER(js_get_BaseData_y), JSOP_WRAPPER(js_set_BaseData_y)},
@@ -1027,4 +1096,5 @@ void register_all_cocos2dx_studio_manual(JSContext* cx, JSObject* global)
         {0, 0, 0, 0, 0}
     };
     JS_DefineProperties(cx, jsb_cocostudio_AnimationData_prototype, movementDataProps);
+    
 }
